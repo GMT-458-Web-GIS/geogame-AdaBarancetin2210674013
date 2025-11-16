@@ -101,10 +101,12 @@ They are included in the `design/` folder.
 [Main Menu Layout](design/menu-layout.jpg.jpeg)
 
 ### 2. Game Screen Layout
-![Game Screen Layout](design/game-screen.jpg)
+[Game Screen Layout](design/game-screen.jpg.jpeg)
+
 
 ### 3. Game Over Layout
-![Game Over Layout](design/game-over.jpg)
+[Game Over Layout](design/game-over.jpg.jpeg)
+
 
 ---
 
