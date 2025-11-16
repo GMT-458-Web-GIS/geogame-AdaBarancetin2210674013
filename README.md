@@ -98,7 +98,7 @@ As required, the User Interface screens were sketched by hand.
 They are included in the `design/` folder.
 
 ### 1. Main Menu Layout
-![Main Menu Layout](design/menu-layout.jpg)
+[Main Menu Layout](design/menu-layout.jpg.jpeg)
 
 ### 2. Game Screen Layout
 ![Game Screen Layout](design/game-screen.jpg)
