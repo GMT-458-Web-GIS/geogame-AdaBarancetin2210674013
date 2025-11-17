@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NYC Taxi Fare Guess - GeoGame</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-logo">🚕</span>
+        <span class="brand-title">NYC Taxi Fare Guess</span>
+      </div>
+      <nav class="main-nav">
+        <button class="nav-btn" data-target="menu-screen">Menu</button>
+        <button class="nav-btn" data-target="howto-screen">How to Play</button>
+      </nav>
+    </header>
+
+    <!-- MAIN MENU -->
+    <main id="menu-screen" class="screen active">
+      <section class="hero">
+        <h1>Test your NYC taxi intuition!</h1>
+        <p>
+          Look at the taxi trip details and try to guess the approximate fare
+          before the timer runs out.
+        </p>
+        <div class="hero-actions">
+          <button id="play-btn" class="primary-btn large">Start Game</button>
+          <button id="howto-btn" class="secondary-btn large">
+            How to Play
+          </button>
+        </div>
+
+        <div class="player-name-input">
+          <label for="player-name">Player name:</label>
+          <input id="player-name" type="text" placeholder="Enter your name" />
+        </div>
+        <section class="best-score">
+          <h2>Top scores</h2>
+          <ol id="leaderboard" class="leaderboard-list">
+            <li class="empty">No scores yet</li>
+          </ol>
+        </section>
+
+        <section class="mode-selector">
+          <h2>Choose game speed</h2>
+          <div class="mode-buttons">
+            <button class="mode-btn selected" data-duration="60">
+              Normal (60 s)
+            </button>
+            <button class="mode-btn" data-duration="30">
+              Fast (30 s)
+            </button>
+            <button class="mode-btn" data-duration="15">
+              Ultra Fast (15 s)
+            </button>
+          </div>
+          <p class="mode-hint">
+            Current mode:
+            <span id="mode-label">Normal (60 s)</span>
+          </p>
+        </section>
+      </section>
+
+      <section class="highlights">
+        <div class="card">
+          <h2>Fast Rounds</h2>
+          <p>Each game has a time limit based on your chosen mode.</p>
+        </div>
+        <div class="card">
+          <h2>Real Taxi Data</h2>
+          <p>
+            Trips are inspired by NYC Taxi data with different boroughs,
+            distances and times.
+          </p>
+        </div>
+        <div class="card">
+          <h2>Geo Component</h2>
+          <p>
+            A map shows the pickup (<strong>P</strong>) and dropoff
+            (<strong>D</strong>) borough for each trip, with selectable map
+            layers.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- HOW TO PLAY -->
+    <main id="howto-screen" class="screen">
+      <section class="info-section">
+        <h1>How to Play</h1>
+        <ol class="steps">
+          <li>
+            On the main menu, enter your <strong>player name</strong>, pick a game speed
+            (<strong>15</strong>, <strong>30</strong> or
+            <strong>60</strong> seconds) and click
+            <strong>Start Game</strong>.
+          </li>
+          <li>
+            For each question, you will see:
+            <ul>
+              <li>Pickup hour</li>
+              <li>Trip distance (in km)</li>
+              <li>Pickup and dropoff boroughs</li>
+              <li>
+                A map showing approximate pickup (<strong>P</strong>) and
+                dropoff (<strong>D</strong>) locations.
+              </li>
+            </ul>
+          </li>
+          <li>
+            Below the trip info, four different fare options (in USD) are
+            shown. Only one is correct.
+          </li>
+          <li>
+            Correct answer: <strong>+100 points</strong><br />
+            Wrong answer or running out of time: <strong>-1 life</strong>
+          </li>
+          <li>
+            You start with <strong>3 lives</strong>. When your lives reach 0,
+            the game ends and a summary table is shown.
+          </li>
+        </ol>
+
+        <p class="tip">
+          Tip: Short trips inside Manhattan are usually cheaper than long trips
+          between outer boroughs at night!
+        </p>
+
+        <button class="primary-btn" id="back-to-menu-btn">Back to Menu</button>
+      </section>
+    </main>
+
+    <!-- GAME SCREEN -->
+    <main id="game-screen" class="screen">
+      <section class="game-layout">
+        <div class="side-panel">
+          <div class="status-bar">
+            <div>⏱ Time: <span id="time">60</span>s</div>
+            <div>⭐ Score: <span id="score">0</span></div>
+            <div>❤️ Lives: <span id="lives">3</span></div>
+          </div>
+
+          <div class="trip-card">
+            <h2>Current Trip</h2>
+            <div id="trip-info">
+              <p>Press <strong>Start Game</strong> to begin.</p>
+            </div>
+          </div>
+
+          <div class="fare-card">
+            <h3>What is the approximate fare?</h3>
+            <div id="options" class="options-grid"></div>
+            <div id="feedback" class="feedback"></div>
+          </div>
+
+          <div class="controls">
+            <button id="start-game-btn" class="primary-btn">
+              Start Game
+            </button>
+            <button id="quit-btn" class="secondary-btn">Quit to Menu</button>
+          </div>
+        </div>
+
+        <div class="map-panel">
+          <div id="map"></div>
+          <p class="map-caption">
+            P = pickup location, D = dropoff location (approximate). Use the
+            layer control on the map to change the basemap.
+          </p>
+        </div>
+      </section>
+
+      <!-- Game over overlay -->
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Game Over</h2>
+          <p id="final-message"></p>
+
+          <table class="score-table">
+            <tr>
+              <th>Total score</th>
+              <td><span id="final-score">0</span></td>
+            </tr>
+            <tr>
+              <th>Correct answers</th>
+              <td><span id="final-correct">0</span></td>
+            </tr>
+            <tr>
+              <th>Total questions</th>
+              <td><span id="final-total">0</span></td>
+            </tr>
+          </table>
+
+          <div class="overlay-leaderboard">
+            <h3>Top 3 scores</h3>
+            <ol id="overlay-leaderboard" class="leaderboard-list small">
+              <li class="empty">No scores yet</li>
+            </ol>
+          </div>
+
+          <div class="overlay-actions">
+            <button id="play-again-btn" class="primary-btn">Play Again</button>
+            <button id="overlay-menu-btn" class="secondary-btn">
+              Back to Menu
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <p>NYC Taxi Fare Guess</p>
+    </footer>
+  </div>
+
+  <div id="taxi-cursor">🚕</div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    crossorigin=""
+  ></script>
+  <script src="main.js"></script>
+</body>
+</html>
