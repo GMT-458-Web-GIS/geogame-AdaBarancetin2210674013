@@ -1,4 +1,4 @@
-# NYC Taxi Fare Guess – Design Document
+# NYC Taxi Fare Guess – Design Documen
 
 This document explains the design phase of the NYC Taxi Fare Guess geo-game.  
 The goal of this phase is to define the game requirements, user interface layout, game flow, and the logic behind the system before implementation.
