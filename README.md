@@ -121,3 +121,8 @@ They are included in the `design/` folder.
 ```
 
 This document summarizes the full design phase before implementation begins.
+
+## Live Website
+
+[Click here to visit the live site](https://gmt-458-web-gis.github.io/geogame-AdaBarancetin2210674013/)
+
